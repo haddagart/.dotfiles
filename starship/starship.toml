@@ -1,51 +1,72 @@
-format = """\
-[](bg:#030B16 fg:#7DF9AA)\
-[󰀵 ](bg:#7DF9AA fg:#090c0c)\
-[](fg:#7DF9AA bg:#1C3A5E)\
-$time\
-[](fg:#1C3A5E bg:#3B76F0)\
-$directory\
-[](fg:#3B76F0 bg:#FCF392)\
-$git_branch\
-$git_status\
-$git_metrics\
-[](fg:#FCF392 bg:#030B16)\
+format = """
 $character\
+$directory\
+[ ▶](bold bg:#7aa2f7 fg:#cfc9c2)[ ](fg:#7aa2f7)\
+$cmd_duration\
+$new_line
 """
 
-[directory]
-format = "[ ﱮ $path ]($style)"
-style = "fg:#E4E4E4 bg:#3B76F0"
-
-[git_branch]
-format = '[ $symbol$branch(:$remote_branch) ]($style)'
-symbol = "  "
-style = "fg:#1C3A5E bg:#FCF392"
-
-[git_status]
-format = '[$all_status]($style)'
-style = "fg:#1C3A5E bg:#FCF392"
-
-[git_metrics]
-format = "([+$added]($added_style))[]($added_style)"
-added_style = "fg:#1C3A5E bg:#FCF392"
-deleted_style = "fg:bright-red bg:235"
-disabled = false
-
-[hg_branch]
-format = "[ $symbol$branch ]($style)"
-symbol = " "
-
-[cmd_duration]
-format = "[  $duration ]($style)"
-style = "fg:bright-white bg:18"
+right_format = """
+[](fg:#e0af68)$sudo[ ](fg:#e0af68)\
+[](fg:#15161e)\
+$git_branch$git_commit$git_status\
+$python
+[](fg:#15161e)\
+"""
 
 [character]
-success_symbol = '[ ➜](bold green) '
-error_symbol = '[ ✗](#E84D44) '
+success_symbol = "[](fg:#9ece6a)[■](bold bg:#9ece6a fg:#15161e)[ ](fg:#9ece6a)"
+error_symbol = "[](fg:#f7768e)[×](bold bg:#f7768e fg:#15161e)[ ](fg:#f7768e)"
+format = "$symbol"
 
-[time]
+[directory]
+style = "fg:#ebebeb bg:#15161e"
+format = "[](fg:#15161e)[$path ]($style)[](fg:#15161e bg:#7aa2f7)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"Music" = ""
+"Pictures" = ""
+"Codes" = "󰅴"
+"Data" = "󰆼"
+
+[cmd_duration]
+min_time = 60000
+format = "[](fg:#e0af68)[󰚭 $duration](bold bg:#e0af68 fg:#15161e)[ ](fg:#e0af68)"
+
+[sudo]
+symbol = ""
+format = "[$symbol]($style)"
+style = "bg:#e0af68 fg:#24283b"
 disabled = false
-time_format = "%R" # Hour:Minute Format
-style = "bg:#1d2230"
-format = '[[ 󱑍 $time ](bg:#1C3A5E fg:#8DFBD2)]($style)'
+
+[username]
+style_root = "bold bg:#e0af68 fg:#f7768e"
+style_user = "bold bg:#e0af68 fg:#24283b"
+format = "[]($style)"
+show_always = true
+
+[git_branch]
+symbol = ''
+truncation_length = 4
+truncation_symbol = ':'
+style = "bg:#15161e fg:#e0af68"
+format = "[$branch -> ]($style)"
+# ignore_branches = ['master', 'main']
+
+[git_commit]
+commit_hash_length = 7
+style = "bg:#15161e fg:#e0af68"
+format = "[#$hash -> ]($style)"
+
+[git_status]
+style = "fg:#7aa2f7 bg:#15161e"
+format = "[$all_status ⇡${ahead_count}⇣${behind_count} ]($style)"
+
+[python]
+symbol = " "
+style = "bg:#15161e fg:#9ece6a"
+format = "[$symbol$version $virtualenv]($style)"
