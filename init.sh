@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# This is temporary, it may change to links and other specialized scripts 
+# In best cases it will be further tuned using charm CLI to transform it into an installation wizard
+
 # Define standard paths in dotfiles
 export DF=$HOME/.dotfiles
 export DF_NEOFETCH=$DF/neofetch

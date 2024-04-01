@@ -1,9 +1,10 @@
+*/backup/*
 **.DS_Store
-vim/bundle
-vim/pack/minpac/start
 **.netrwhist
 *.swp
-job-specific.sh
+vim/bundle
+vim/pack/minpac/start
 scripts/dark-mode-notify
 bin/format-transactions.js
-*/backup/*
+job-specific.sh
+todo.txt
