@@ -13,4 +13,8 @@ alias snap-zotero="snap run zotero-snap"
 alias snap-spotify="snap run spotify"
 # >>> snap >>>
 
+# >>> System and devices >>>
+alias launch-printer="captstatusui -P LBP2900"
+# <<< System and devices >>>
+
 ############## FUNCTIONS ###################
