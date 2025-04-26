@@ -17,4 +17,19 @@ alias snap-spotify="snap run spotify"
 alias launch-printer="captstatusui -P LBP2900"
 # <<< System and devices >>>
 
+# >>> exa replacement for ls >>>
+alias ls="exa --icons"
+# <<< exa replacement for ls <<<
+
+
+# >>> lazydocker <<<
+alias lzd="sudo ~/.local/bin/lazydocker"
+alias lazydocker="sudo ~/.local/bin/lazydocker"
+# <<< lazydocker <<<
+
+# >>> lazygit >>> 
+alias lazygit="~/.local/bin/lazygit"
+alias lg="~/.local/bin/lazygit"
+# >>> lazygit >>>
+
 ############## FUNCTIONS ###################
