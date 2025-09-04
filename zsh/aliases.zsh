@@ -5,6 +5,10 @@ alias zs="code ~/.zshrc"
 alias cls="clear"
 # >>> zsh >>>
 
+# <<< Important placements <<<
+alias devdir="cd /media/haddagart/Nitrodata/Developer/"
+# >>> Important placements >>>
+
 # <<< snap <<<
 alias snap-telegram="snap run telegram-desktop"
 alias snap-notion="snap run notion-snap-reborn"
@@ -19,6 +23,7 @@ alias launch-printer="captstatusui -P LBP2900"
 
 # >>> exa replacement for ls >>>
 alias ls="exa --icons"
+alias lexa="exa -la --icons"
 # <<< exa replacement for ls <<<
 
 
@@ -31,5 +36,9 @@ alias lazydocker="sudo ~/.local/bin/lazydocker"
 alias lazygit="~/.local/bin/lazygit"
 alias lg="~/.local/bin/lazygit"
 # >>> lazygit >>>
+
+# >>> bat >>>
+alias bat='batcat'
+# <<< bat <<<
 
 ############## FUNCTIONS ###################
