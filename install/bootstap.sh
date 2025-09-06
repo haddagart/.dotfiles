@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-#
+
 # bootstrap installs things.
 
 cd "$(dirname "$0")/.."
-DOTFILES=$(pwd -P)
 
-set -e
+DOTFILES=$(pwd -P)
 
 echo ''
 

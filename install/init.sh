@@ -3,10 +3,18 @@
 # This is temporary, it may change to links and other specialized scripts 
 # In best cases it will be further tuned using charm CLI to transform it into an installation wizard
 
+# Detect OS
+case "$(uname -s)" in
+  Darwin)   export OS="macos" ;;
+  Linux)    export OS="linux" ;;
+  CYGWIN*|MINGW*|MSYS*) export OS="windows" ;;
+  *)        export OS="unknown" ;;
+esac
+
 # Define standard paths in dotfiles
 export DF=$HOME/.dotfiles
-export DF_NEOFETCH=$DF/neofetch
 export DF_ZSH=$DF/zsh
+export DF_NEOFETCH=$DF/neofetch
 export DF_STARSHIP=$DF/starship
 
 # Define standard paths in the operating system
@@ -19,7 +27,6 @@ echo ">>> Setting up zshrc"
 ln -sf $DF_ZSH/.zshrc $OS_ZSH/.zshrc
 
 # Starship
-
 if [ -d $DF_STARSHIP ]; then
     echo ">>> Setting up starship"
     if [ -f $OS_STARSHIP/starship.toml ]; then
@@ -31,8 +38,6 @@ if [ -d $DF_STARSHIP ]; then
         ln -sf $DF_STARSHIP/starship.toml $OS_STARSHIP/starship.toml
     fi
 fi
-
-
 
 # Neofetch
 if [ -d $OS_NEOFETCH ]; then

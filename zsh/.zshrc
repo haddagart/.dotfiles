@@ -1,47 +1,68 @@
-ZSH_THEME="agnoster"
+# ================================
+#  Paths & Environment
+# ================================
+export DOTFILES="$HOME/.dotfiles"
+export OZSH="$HOME/.oh-my-zsh"
 
-export ZSH="$HOME/.oh-my-zsh"
-export DOTFILES=$HOME/.dotfiles
-
-
-# Preferred editor for local and remote sessions
+# Preferred editor
 if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='vim'
+  export EDITOR='vim'
 else
-    export EDITOR='code'
+  export EDITOR='code'
 fi
 
-# Files existence verification function
+# ================================
+#  Helper Functions
+# ================================
 source_if_exists() {
-    if test -r "$1"; then
-        source "$1"
-    fi
+  [[ -r "$1" ]] && source "$1"
 }
 
-# Import aliases before oh-my-zsh
-source_if_exists $DOTFILES/zsh/aliases.zsh
-source_if_exists $DOTFILES/zsh/conda.zsh
-source_if_exists $DOTFILES/zsh/keychain.zsh
-source_if_exists $DOTFILES/zsh/miniforge.zsh
-source_if_exists $DOTFILES/zsh/nvim.zsh
-source_if_exists $DOTFILES/zsh/nvm.zsh
-source_if_exists $DOTFILES/zsh/pyenv.zsh
-
-plugins=(
-    git
-    starship
-    virtualenv
-    you-should-use
-    zsh-bat
-    zsh-autosuggestions
-    zsh-interactive-cd
-    zsh-syntax-highlighting
-    zsh-smartcache
-    z
+# ================================
+#  Custom Scripts
+# ================================
+ZSH_SUBSCRIPTS=(
+  aliases
+  conda
+  keychain
+  nvim
+  nvm
+  pyenv
 )
 
-# Initialize oh-my-zsh
-source $ZSH/oh-my-zsh.sh
+for script in "${ZSH_SUBSCRIPTS[@]}"; do
+  source_if_exists "$DOTFILES/zsh/scripts/$script.zsh"
+done
 
-# Initiliaze starship
+# ================================
+#  Plugins
+# ================================
+# -- Option A: using zap (faster, lightweight)
+source ~/.local/share/zap/zap.zsh
+while IFS= read -r plugin; do
+  [[ -z "$plugin" || "$plugin" =~ ^# ]] && continue
+  plug "$plugin"
+done < "$DOTFILES/zsh/plugins.txt"
+
+# -- Option B: using oh-my-zsh (comment out zap if you prefer this)
+# plugins=(git virtualenv z)
+# source $OZSH/oh-my-zsh.sh
+
+# ================================
+#  Keychain
+# ================================
+# Load keychain only once (via init.sh)
+if command -v keychain >/dev/null 2>&1; then
+  if [[ -z "$SSH_AUTH_SOCK" || ! -S "$SSH_AUTH_SOCK" ]]; then
+    [[ -f "$HOME/.dotfiles/keychain/init.sh" ]] && source "$HOME/.dotfiles/keychain/init.sh"
+  fi
+fi
+
+# ================================
+#  Prompt
+# ================================
+# Powerlevel10k (⚠️ disable if using starship)
+# [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+# Starship (⚠️ disable if using p10k)
 eval "$(starship init zsh)"

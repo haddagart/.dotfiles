@@ -16,3 +16,6 @@ bin/format-transactions.js
 job-specific.sh
 todo.txt
 nvim-old/
+# keychain
+# list the keys that you want to register using keychain here
+keychain/keys.txt
