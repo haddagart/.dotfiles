@@ -1,0 +1,8 @@
+# romkatv/powerlevel10k
+QuarticCat/zsh-smartcache
+zap-zsh/exa
+zap-zsh/supercharge
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+MichaelAquilina/zsh-you-should-use
+conda-incubator/conda-zsh-completion
