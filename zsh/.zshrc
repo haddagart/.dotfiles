@@ -66,3 +66,9 @@ fi
 
 # Starship (⚠️ disable if using p10k)
 eval "$(starship init zsh)"
+
+# The next line updates PATH for the Google Cloud SDK.
+# if [ -f 'Applications/google-cloud-sdk/path.zsh.inc' ]; then . 'Applications/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+# if [ -f 'Applications/google-cloud-sdk/completion.zsh.inc' ]; then . 'Applications/google-cloud-sdk/completion.zsh.inc'; fi

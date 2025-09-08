@@ -3,110 +3,88 @@
 # bootstrap installs things.
 
 cd "$(dirname "$0")/.."
-
 DOTFILES=$(pwd -P)
 
 echo ''
 
 info() {
-  printf "\r  [ \033[00;34m..\033[0m ] $1\n"
+  printf "\r  [ \033[00;34m..\033[0m ] %s\n" "$1"
 }
 
 user() {
-  printf "\r  [ \033[0;33m??\033[0m ] $1\n"
+  printf "\r  [ \033[0;33m??\033[0m ] %s\n" "$1"
 }
 
 success() {
-  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] $1\n"
+  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] %s\n" "$1"
 }
 
 fail() {
-  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] $1\n"
-  echo ''
-  exit
+  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
 }
 
 link_file() {
   local src=$1 dst=$2
+  local overwrite= backup= skip= action=
 
-  local overwrite=
-  local backup=
-  local skip=
-  local action=
+  # Expand ~
+  eval src="$src"
+  eval dst="$dst"
 
-  if [ -f "$dst" ] || [ -d "$dst" ] || [ -L "$dst" ]; then
-    if [ "$overwrite_all"=="false" ] && [ "$backup_all"=="false" ] && [ "$skip_all"=="false" ]; then
+  # Verify source exists
+  if [ ! -e "$src" ]; then
+    fail "source not found: $src"
+    return
+  fi
 
-      # ignoring exit 1 from readlink in case where file already exists
-      # shellcheck disable=SC2155
-      local currentSrc="$(readlink $dst)"
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    local currentSrc
+    currentSrc="$(readlink "$dst" 2>/dev/null)"
 
-      if [ "$currentSrc" = "$src" ]; then
+    if [ "$currentSrc" = "$src" ]; then
+      success "already linked $dst → $src"
+      return
+    fi
 
-        skip=true
+    if [ "$overwrite_all" = "false" ] && [ "$backup_all" = "false" ] && [ "$skip_all" = "false" ]; then
+      user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
+      [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
+      read -n 1 action </dev/tty
+      echo
 
-      else
-
-        user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
-        [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action </dev/tty
-
-        case "$action" in
-        o)
-          overwrite=true
-          ;;
-        O)
-          overwrite_all=true
-          ;;
-        b)
-          backup=true
-          ;;
-        B)
-          backup_all=true
-          ;;
-        s)
-          skip=true
-          ;;
-        S)
-          skip_all=true
-          ;;
+      case "$action" in
+        o) overwrite=true ;;
+        O) overwrite_all=true ;;
+        b) backup=true ;;
+        B) backup_all=true ;;
+        s) skip=true ;;
+        S) skip_all=true ;;
         *) ;;
-        esac
-
-      fi
-
+      esac
     fi
 
     overwrite=${overwrite:-$overwrite_all}
     backup=${backup:-$backup_all}
     skip=${skip:-$skip_all}
 
-    if [ "$overwrite"=="true" ]; then
+    if [ "$overwrite" = "true" ]; then
       rm -rf "$dst"
       success "removed $dst"
     fi
 
-    if [ "$backup"=="true" ]; then
+    if [ "$backup" = "true" ]; then
       mv "$dst" "${dst}.backup"
       success "moved $dst to ${dst}.backup"
     fi
 
-    if [ "$skip"=="true" ]; then
+    if [ "$skip" = "true" ]; then
       success "skipped $src"
+      return
     fi
   fi
 
-  if [ "$skip" != "true" ]; then # "false" or empty
-    ln -s "$1" "$2"
-    success "linked $1 to $2"
-  fi
-}
-
-prop() {
-  PROP_KEY=$1
-  PROP_FILE=$2
-  PROP_VALUE=$(eval echo "$(cat $PROP_FILE | grep "$PROP_KEY" | cut -d'=' -f2)")
-  echo $PROP_VALUE
+  ln -s "$src" "$dst"
+  success "linked $dst → $src"
 }
 
 install_dotfiles() {
@@ -114,27 +92,35 @@ install_dotfiles() {
 
   local overwrite_all=false backup_all=false skip_all=false
 
-  find -H "$DOTFILES" -maxdepth 2 -name 'links.prop' -not -path '*.git*' | while read linkfile; do
-    while IFS= read -r line; do
-      local src dst dir
-      src=$(eval echo "$line" | cut -d '=' -f 1)
-      dst=$(eval echo "$line" | cut -d '=' -f 2)
-      dir=$(dirname $dst)
+  find -H "$DOTFILES" -maxdepth 2 -name 'links.prop' -not -path '*.git*' | while read -r linkfile; do
+    while IFS='=' read -r src dst; do
+      # Skip empty lines and comments
+      [ -z "$src" ] && continue
+      [[ "$src" =~ ^# ]] && continue
+
+      # Trim whitespace without echo/xargs
+      src=${src#"${src%%[![:space:]]*}"}   # remove leading spaces
+      src=${src%"${src##*[![:space:]]}"}   # remove trailing spaces
+      dst=${dst#"${dst%%[![:space:]]*}"}   # remove leading spaces
+      dst=${dst%"${dst##*[![:space:]]}"}   # remove trailing spaces
+
+      # Make relative path absolute
+      src="$DOTFILES/$src"
 
       link_file "$src" "$dst"
-    done <<<$(<"$linkfile")
+    done <"$linkfile"
   done
 }
 
 create_env_file() {
-  if test -f "$HOME/.env.sh"; then
+  if [ -f "$HOME/.env.sh" ]; then
     success "$HOME/.env.sh file already exists, skipping"
   else
-    echo "export DOTFILES=$DOTFILES" >$HOME/.env.sh
+    echo "export DOTFILES=$DOTFILES" >"$HOME/.env.sh"
     success 'created ~/.env.sh'
   fi
 }
 
 install_dotfiles
 # create_env_file
-success 'All installed!'
+success '🎉 All installed!'

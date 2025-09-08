@@ -19,3 +19,4 @@ nvim-old/
 # keychain
 # list the keys that you want to register using keychain here
 keychain/keys.txt
+keychain/.ssh-keys
