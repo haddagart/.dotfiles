@@ -4,11 +4,14 @@
 zsh/.zshrc = ~/.zshrc
 
 # Git configuration
-git/.gitconfig = ~/.gitconfig
+# git/.gitconfig = ~/.gitconfig
 
 # Vim / Neovim configuration
 vim/.vimrc = ~/.vimrc
-config/nvim = ~/.config/nvim
+# config/nvim = ~/.config/nvim
 
 # Starship prompt configuration
 starship/starship.toml = ~/.config/starship.toml
+
+# Wezterm configuration
+terminals/wezterm/.wezterm.lua = ~/.wezterm.lua

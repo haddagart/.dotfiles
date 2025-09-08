@@ -88,9 +88,11 @@ FORMULAS=(
 CASKS=(
   dbeaver-community\
   double-commander\
+  font-caskaydia-cove-nerd-font\
   miniconda\
   notion\
   ticktick\
+  wezterm\
 )
 
 center_text "INSTALLING HOMEBREW FORMULAS"
