@@ -1,22 +1,32 @@
 # Folders
 */backup/*
+~/
+
 # Global and OS-specific files
 **.DS_Store
 **.netrwhist
 *.swp
+
 # VIM
 vim/bundle
 vim/pack/minpac/start
+
 # ZSH
 zsh/keychain.zsh
+
 # Linux configurations
 scripts/dark-mode-notify
 bin/format-transactions.js
+
 # Other and misc.
 job-specific.sh
 todo.txt
 nvim-old/
+
 # keychain
 # list the keys that you want to register using keychain here
 keychain/keys.txt
 keychain/.ssh-keys
+
+# AI Agents
+.claude/

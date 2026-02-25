@@ -68,7 +68,26 @@ fi
 eval "$(starship init zsh)"
 
 # The next line updates PATH for the Google Cloud SDK.
-# if [ -f 'Applications/google-cloud-sdk/path.zsh.inc' ]; then . 'Applications/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f 'Applications/google-cloud-sdk/path.zsh.inc' ]; then . 'Applications/google-cloud-sdk/path.zsh.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-# if [ -f 'Applications/google-cloud-sdk/completion.zsh.inc' ]; then . 'Applications/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f 'Applications/google-cloud-sdk/completion.zsh.inc' ]; then . 'Applications/google-cloud-sdk/completion.zsh.inc'; fi
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/haddagart/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
+
+# bun completions
+[ -s "/Users/haddagart/.bun/_bun" ] && source "/Users/haddagart/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Google Gemini CLI
+export GEMINI_MODEL="gemini-2.5-flash"
+export GEMINI_API_KEY="REDACTED"
+
+# Added by Antigravity
+export PATH="/Users/haddagart/.antigravity/antigravity/bin:$PATH"

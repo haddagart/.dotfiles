@@ -13,5 +13,8 @@ vim/.vimrc = ~/.vimrc
 # Starship prompt configuration
 starship/starship.toml = ~/.config/starship.toml
 
+# Tmux configuration
+tmux/.tmux.conf = ~/.tmux.conf
+
 # Wezterm configuration
 terminals/wezterm/.wezterm.lua = ~/.wezterm.lua

@@ -1,57 +1,48 @@
 #!/usr/bin/env bash
 
-# bootstrap installs things.
+set -e
 
-cd "$(dirname "$0")/.."
-DOTFILES=$(pwd -P)
+DOTFILES="$(cd "$(dirname "$0")/.." && pwd -P)"
 
-echo ''
+source "$DOTFILES/lib/console.sh"
 
-info() {
-  printf "\r  [ \033[00;34m..\033[0m ] %s\n" "$1"
-}
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
-user() {
-  printf "\r  [ \033[0;33m??\033[0m ] %s\n" "$1"
-}
-
-success() {
-  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] %s\n" "$1"
-}
-
-fail() {
-  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
+# Detect if running on Windows (Git Bash / MSYS2 / Cygwin)
+_is_windows() {
+  case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) return 0 ;; esac
+  return 1
 }
 
 link_file() {
-  local src=$1 dst=$2
-  local overwrite= backup= skip= action=
+  local src="$1" dst="$2"
 
-  # Expand ~
-  eval src="$src"
-  eval dst="$dst"
+  # Expand variables and ~
+  src="${src/\$DOTFILES/$DOTFILES}"
+  src="${src/\$HOME/$HOME}"
+  src="${src/#\~/$HOME}"
+  dst="${dst/\$DOTFILES/$DOTFILES}"
+  dst="${dst/\$HOME/$HOME}"
+  dst="${dst/#\~/$HOME}"
 
-  # Verify source exists
   if [ ! -e "$src" ]; then
-    fail "source not found: $src"
+    error "Source not found: $src"
     return
   fi
 
+  # Already correctly linked
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    ok "Already linked: $dst → $src"
+    return
+  fi
+
+  # Destination exists but is not our link
   if [ -e "$dst" ] || [ -L "$dst" ]; then
-    local currentSrc
-    currentSrc="$(readlink "$dst" 2>/dev/null)"
-
-    if [ "$currentSrc" = "$src" ]; then
-      success "already linked $dst → $src"
-      return
-    fi
-
     if [ "$overwrite_all" = "false" ] && [ "$backup_all" = "false" ] && [ "$skip_all" = "false" ]; then
-      user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
-      [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
+      log "File already exists: $dst ($(basename "$src"))"
+      printf "  [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all? "
       read -n 1 action </dev/tty
       echo
-
       case "$action" in
         o) overwrite=true ;;
         O) overwrite_all=true ;;
@@ -59,68 +50,69 @@ link_file() {
         B) backup_all=true ;;
         s) skip=true ;;
         S) skip_all=true ;;
-        *) ;;
       esac
     fi
 
-    overwrite=${overwrite:-$overwrite_all}
-    backup=${backup:-$backup_all}
-    skip=${skip:-$skip_all}
+    local _overwrite="${overwrite:-$overwrite_all}"
+    local _backup="${backup:-$backup_all}"
+    local _skip="${skip:-$skip_all}"
 
-    if [ "$overwrite" = "true" ]; then
+    if [ "$_overwrite" = "true" ]; then
       rm -rf "$dst"
-      success "removed $dst"
-    fi
-
-    if [ "$backup" = "true" ]; then
+      success "Removed: $dst"
+    elif [ "$_backup" = "true" ]; then
       mv "$dst" "${dst}.backup"
-      success "moved $dst to ${dst}.backup"
-    fi
-
-    if [ "$skip" = "true" ]; then
-      success "skipped $src"
+      success "Backed up: $dst → ${dst}.backup"
+    elif [ "$_skip" = "true" ]; then
+      ok "Skipped: $src"
       return
     fi
   fi
 
-  ln -s "$src" "$dst"
-  success "linked $dst → $src"
+  # Ensure destination directory exists
+  mkdir -p "$(dirname "$dst")"
+
+  if _is_windows; then
+    # On Windows use PowerShell to create a symlink (requires Developer Mode or admin)
+    powershell.exe -Command "New-Item -ItemType SymbolicLink -Path '$dst' -Target '$src'" &>/dev/null \
+      && success "Linked (Windows): $dst → $src" \
+      || error "Failed to link (run as admin or enable Developer Mode): $dst"
+  else
+    ln -s "$src" "$dst"
+    success "Linked: $dst → $src"
+  fi
 }
 
+# ── Install dotfiles ──────────────────────────────────────────────────────────
+
 install_dotfiles() {
-  info 'installing dotfiles'
+  center_text "INSTALLING DOTFILES"
 
   local overwrite_all=false backup_all=false skip_all=false
+  local overwrite= backup= skip=
 
-  find -H "$DOTFILES" -maxdepth 2 -name 'links.prop' -not -path '*.git*' | while read -r linkfile; do
+  find -H "$DOTFILES" -maxdepth 2 -name 'links.prop' -not -path '*/.git/*' | while read -r linkfile; do
     while IFS='=' read -r src dst; do
       # Skip empty lines and comments
       [ -z "$src" ] && continue
       [[ "$src" =~ ^# ]] && continue
 
-      # Trim whitespace without echo/xargs
-      src=${src#"${src%%[![:space:]]*}"}   # remove leading spaces
-      src=${src%"${src##*[![:space:]]}"}   # remove trailing spaces
-      dst=${dst#"${dst%%[![:space:]]*}"}   # remove leading spaces
-      dst=${dst%"${dst##*[![:space:]]}"}   # remove trailing spaces
+      # Trim whitespace
+      src="${src#"${src%%[![:space:]]*}"}"
+      src="${src%"${src##*[![:space:]]}"}"
+      dst="${dst#"${dst%%[![:space:]]*}"}"
+      dst="${dst%"${dst##*[![:space:]]}"}"
 
-      # Make relative path absolute
-      src="$DOTFILES/$src"
+      # Make relative paths (no leading $) absolute from DOTFILES root
+      if [[ "$src" != \$* && "$src" != \~* && "$src" != /* ]]; then
+        src="$DOTFILES/$src"
+      fi
 
       link_file "$src" "$dst"
-    done <"$linkfile"
+    done < "$linkfile"
   done
 }
 
-create_env_file() {
-  if [ -f "$HOME/.env.sh" ]; then
-    success "$HOME/.env.sh file already exists, skipping"
-  else
-    echo "export DOTFILES=$DOTFILES" >"$HOME/.env.sh"
-    success 'created ~/.env.sh'
-  fi
-}
-
 install_dotfiles
-# create_env_file
-success '🎉 All installed!'
+
+center_text "BOOTSTRAPPING DONE"
