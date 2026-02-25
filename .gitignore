@@ -13,6 +13,7 @@ vim/pack/minpac/start
 
 # ZSH
 zsh/keychain.zsh
+zsh/byos/secrets.zsh
 
 # Linux configurations
 scripts/dark-mode-notify

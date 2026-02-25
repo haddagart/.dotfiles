@@ -2,6 +2,15 @@
 #  Windows/WSL-specific aliases
 # ================================
 
+# ── Tree view ─────────────────────────────────────────────────────────────────
+if command -v eza &>/dev/null; then
+  alias tree="eza --tree --icons --level=2"
+elif command -v tree &>/dev/null; then
+  alias tree="tree -L 2 --dirsfirst"
+else
+  alias tree="find . -maxdepth 2 | sed -e 's/[^-][^\/]*\//  |/g' -e 's/|\([^ ]\)/|-\1/'"
+fi
+
 # ── Dev directories ───────────────────────────────────────────────────────────
 alias devdir="cd /mnt/c/Users/$USER/Developer"
 alias devmac="cd ~/Developer/repos"

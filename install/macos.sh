@@ -179,7 +179,7 @@ defaults write com.apple.screensaver askForPassword      -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Screenshots: PNG, saved to Desktop, no drop shadow, with timestamp
-defaults write com.apple.screencapture location        -string "${HOME}/Desktop"
+defaults write com.apple.screencapture location        -string "${HOME}/Pictures/Screenshots"
 defaults write com.apple.screencapture type            -string "png"
 defaults write com.apple.screencapture disable-shadow  -bool true
 defaults write com.apple.screencapture include-date    -bool true

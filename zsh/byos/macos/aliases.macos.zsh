@@ -2,6 +2,13 @@
 #  macOS-specific aliases
 # ================================
 
+# ── Tree view ─────────────────────────────────────────────────────────────────
+if command -v eza &>/dev/null; then
+  alias tree="eza --tree --icons --level=2"
+else
+  alias tree="find . -maxdepth 2 | sed -e 's/[^-][^\/]*\//  |/g' -e 's/|\([^ ]\)/|-\1/'"
+fi
+
 # ── Dev directories ───────────────────────────────────────────────────────────
 alias devmac="cd ~/Developer/repos"
 alias devdir="cd ~/Developer"

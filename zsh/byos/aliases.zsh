@@ -1,12 +1,12 @@
 # ================================
 #  Aliases — universal loader
 #  OS-specific aliases are in:
-#    aliases.macos.zsh
-#    aliases.linux.zsh
-#    aliases.windows.zsh
+#    byos/macos/aliases.macos.zsh
+#    byos/linux/aliases.linux.zsh
+#    byos/windows/aliases.windows.zsh
 # ================================
 
-_ALIASES_DIR="$DOTFILES/zsh/scripts"
+_ALIASES_DIR="$DOTFILES/zsh/byos"
 
 # ── Shell ──────────────────────────────────────────────────────────────────────
 alias cls="clear"
@@ -14,17 +14,19 @@ alias zs="${EDITOR:-code} ~/.zshrc"
 alias reload="source ~/.zshrc"
 
 # ── Navigation ─────────────────────────────────────────────────────────────────
+alias .="cd ./"
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 
+
 # ── ls → eza ──────────────────────────────────────────────────────────────────
 if command -v eza &>/dev/null; then
-  alias ls="eza --icons"
-  alias ll="eza -l --icons"
-  alias la="eza -la --icons"
-  alias lt="eza --tree --icons"
-  alias lexa="eza -la --icons"
+  alias eza-lx="eza -la --icons"
+  alias eza-la="eza -la --icons"
+  alias eza-ll="eza -l --icons"
+  alias eza-ls="eza --icons"
+  alias eza-lt="eza --tree --icons"
 else
   alias ll="ls -lh"
   alias la="ls -lah"
@@ -84,14 +86,14 @@ alias ports="ss -tulnp 2>/dev/null || netstat -tulnp 2>/dev/null"
 # ── Load OS-specific aliases ───────────────────────────────────────────────────
 case "$(uname -s)" in
   Darwin)
-    [[ -r "$_ALIASES_DIR/aliases.macos.zsh" ]] && source "$_ALIASES_DIR/aliases.macos.zsh"
+    source_if_exists "$_ALIASES_DIR/macos/aliases.macos.zsh"
     ;;
   Linux)
     # Detect WSL
     if grep -qi microsoft /proc/version 2>/dev/null; then
-      [[ -r "$_ALIASES_DIR/aliases.windows.zsh" ]] && source "$_ALIASES_DIR/aliases.windows.zsh"
+      source_if_exists "$_ALIASES_DIR/windows/aliases.windows.zsh"
     fi
-    [[ -r "$_ALIASES_DIR/aliases.linux.zsh" ]] && source "$_ALIASES_DIR/aliases.linux.zsh"
+    source_if_exists "$_ALIASES_DIR/linux/aliases.linux.zsh"
     ;;
 esac
 

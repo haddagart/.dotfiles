@@ -2,6 +2,15 @@
 #  Linux-specific aliases
 # ================================
 
+# ── Tree view ─────────────────────────────────────────────────────────────────
+if command -v eza &>/dev/null; then
+  alias tree="eza --tree --icons --level=2"
+elif command -v tree &>/dev/null; then
+  alias tree="tree -L 2 --dirsfirst"
+else
+  alias tree="find . -maxdepth 2 | sed -e 's/[^-][^\/]*\//  |/g' -e 's/|\([^ ]\)/|-\1/'"
+fi
+
 # ── Dev directories ───────────────────────────────────────────────────────────
 # Adjust path to match your Linux setup
 alias devdir="cd /media/haddagart/Nitrodata/Developer/"
