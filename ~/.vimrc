@@ -1,1 +1,0 @@
-/Users/haddagart/.dotfiles/vim/.vimrc

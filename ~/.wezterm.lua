@@ -1,1 +1,0 @@
-/Users/haddagart/.dotfiles/terminals/wezterm/.wezterm.lua

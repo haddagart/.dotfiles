@@ -1,6 +1,6 @@
 # Folders
 */backup/*
-~/
+.backup/
 
 # Global and OS-specific files
 **.DS_Store
