@@ -22,6 +22,7 @@ Personal development environment configuration for macOS, Linux, and Windows. Ma
   - [Neovim](#neovim)
   - [WezTerm](#wezterm)
   - [Vim](#vim)
+- [Logging](#logging)
 - [Toolchain](#toolchain)
 
 ---
@@ -43,8 +44,10 @@ Personal development environment configuration for macOS, Linux, and Windows. Ma
 │       ├── linux/packages.sh
 │       └── windows/packages.ps1
 ├── lib/
-│   ├── console.sh        # Shared logging helpers (bash)
-│   └── console.ps1       # Shared logging helpers (PowerShell)
+│   ├── console.sh        # Structured JSON logging helpers (bash)
+│   ├── console.ps1       # Shared logging helpers (PowerShell)
+│   └── commands/
+│       └── update.sh     # System update command (apt)
 ├── zsh/                  # Zsh config, plugins, and per-OS scripts
 ├── starship/             # Starship prompt config
 ├── tmux/                 # Tmux config + TPM plugins
@@ -52,7 +55,7 @@ Personal development environment configuration for macOS, Linux, and Windows. Ma
 ├── vim/                  # Vim config
 ├── terminals/wezterm/    # WezTerm config
 ├── neofetch/             # Neofetch config and themes
-├── keychain/             # SSH key loading helper
+├── keychain/             # SSH key loading helper (private-key detection)
 ├── vscode/               # VS Code CSS/JS customizations
 └── links.prop            # Symlink definitions
 ```
@@ -251,7 +254,7 @@ bash ~/.dotfiles/install/bootstap.sh
 
 - Uses [Starship](https://starship.rs) as the prompt
 - Plugin management via [Zap](https://github.com/zap-zsh/zap) — plugin list in `zsh/plugins.txt`
-- SSH keys auto-loaded via `keychain` (see `keychain/init.sh`)
+- SSH keys auto-loaded via `keychain` (see `keychain/init.sh`) — only files containing a `PRIVATE KEY` header are loaded; public keys, `known_hosts`, `config`, and `*.old` files are skipped automatically
 - Editor: `vim` over SSH, `code` (VS Code) locally
 
 **Plugins**
@@ -275,7 +278,7 @@ bash ~/.dotfiles/install/bootstap.sh
 | `pyenv.zsh` | pyenv init |
 | `nvm.zsh` | nvm init |
 | `nvim.zsh` | Adds Neovim to PATH |
-| `conda.zsh` | Conda init |
+| `conda.zsh` | Conda init (generic, sourced on all platforms) |
 
 **Key aliases (universal)**
 
@@ -430,6 +433,20 @@ Minimal config for quick editing and remote sessions:
 - Hybrid line numbers (absolute current + relative others)
 - 4-space indentation (spaces, not tabs)
 - Current line highlighting
+
+---
+
+## Logging
+
+**Source:** `lib/console.sh`
+
+All install and update scripts share a structured logging library. Each call appends a JSON line to `logs.json` in the dotfiles root (excluded from version control via `.gitignore`).
+
+```json
+{"timestamp":"2025-01-01T12:00:00Z","level":"INFO","message":"Updating system ..."}
+```
+
+Available functions: `info`, `success`, `error`, `log`, `ok`, `center`, `center_text` — all write to `logs.json` instead of stdout.
 
 ---
 

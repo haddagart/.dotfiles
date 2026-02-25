@@ -31,3 +31,6 @@ keychain/.ssh-keys
 
 # AI Agents
 .claude/
+
+# Logs
+logs.json

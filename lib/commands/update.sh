@@ -1,6 +1,8 @@
 #!/bin/bash
-echo "Updating system ..."
+source "$(dirname "$0")/../console.sh"
+
+log "Updating system ..."
 sudo apt full-upgrade -y
-echo "Cleaning up ..."
+log "Cleaning up ..."
 sudo apt autoremove -y
-echo "Cleaning done."
+log "Cleaning done."
